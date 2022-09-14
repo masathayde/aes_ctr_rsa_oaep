@@ -6,7 +6,7 @@ import rsa
 def RSA_OAEP_enc (message: bytes, public_key: int, modulus: int) -> int:
     keySize = modulus.bit_length()
     paddedMessage = oaep.OAEP_enc(message, keySize)
-    print(paddedMessage)
+    # print(paddedMessage)
     messageToInt = int.from_bytes(paddedMessage, 'big')
     return pow(messageToInt, public_key, modulus)
 
@@ -14,7 +14,7 @@ def RSA_OAEP_dec (message: int, private_key: int, modulus: int) -> "tuple[bool, 
     unRSAdMessage = pow(message, private_key, modulus)
     messageLength = ceil(modulus.bit_length()/8) 
     paddedBlock = unRSAdMessage.to_bytes(messageLength, 'big')
-    print(paddedBlock)
+    # print(paddedBlock)
     return oaep.OAEP_dec(paddedBlock)
 
 def testRSA ():

@@ -14,7 +14,7 @@ def RSA_2048 ():
     # e candidates: 3, 17, 257, 65537.
     # Not checking if e is coprime with phi(N). We just hope it is lol.
     e_candidates = (65537, 4294967297, 257, 17, 5, 3, 18446744073709551617)
-    e = 17
+    e = 65537
     index = 1
     p = generatePrime(1024)
     q = generatePrime(1024)

@@ -96,8 +96,8 @@ def AES_128_11R_CTR_A (state: bytearray, round_keys):
     return state
 
 
-# Output: cyphertext and nonce
-def AES_128_CTR(data: bytearray, nonce: bytes, round_keys: bytes) -> bytes:
+# Output: cyphertext
+def AES_128_CTR(data: bytearray, nonce: int, round_keys: bytes) -> bytes:
     numberOfBlocks = -(len(data)//-16) # ceiling division
     lastBlockLength = len(data) % 16
     if (lastBlockLength == 0): # In case the datastream's length is a multiple of 16
@@ -115,6 +115,32 @@ def AES_128_CTR(data: bytearray, nonce: bytes, round_keys: bytes) -> bytes:
     keystream = AES_128_11R_CTR_A(counterBlock, round_keys)
     stream = stream + (bytes_xor(data[i*16:i*16+lastBlockLength], bytes(keystream[:lastBlockLength])))
     return stream
+
+class AES_128_CTR:
+    def __init__(self, key: bytes, IV: int):
+        self.key = key
+        self.iv = IV
+        self.round_keys = AES_128_Key_Expansion(key)
+
+    def execute(self, data: bytearray) -> bytes:
+        numberOfBlocks = -(len(data)//-16) # ceiling division
+        lastBlockLength = len(data) % 16
+        if (lastBlockLength == 0): # In case the datastream's length is a multiple of 16
+            lastBlockLength = 16
+        stream = b''
+        for i in range(0, numberOfBlocks - 1):
+            counterBlock = bytearray(int.to_bytes(self.iv, 16, 'big'))
+            keystream = AES_128_11R_CTR_A(counterBlock, self.round_keys)
+            stream = stream + (bytes_xor(data[i*16:i*16+16], bytes(keystream)))
+            self.iv += 1
+        # Last block
+        i = numberOfBlocks - 1
+        counterBlock = bytearray(int.to_bytes(self.iv, 16, 'big'))
+        keystream = AES_128_11R_CTR_A(counterBlock, self.round_keys)
+        stream = stream + (bytes_xor(data[i*16:i*16+lastBlockLength], bytes(keystream[:lastBlockLength])))
+        self.iv += 1
+        return stream
+
 
 # key = 299984085813498672233706979041151314691
 # # number = 1123231413242324242323423
